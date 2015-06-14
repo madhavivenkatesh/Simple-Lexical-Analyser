@@ -1,194 +1,172 @@
 #include <stdio.h>
-#define MAXSIZE 11
+#include <conio.h>
 
-struct stack
+char *stringDelimiter(char *str, char *comp);
+void main()
 {
-    int stk[MAXSIZE];
-    int top;
-};
-typedef struct stack STACK;
-STACK s;
+        char ch;
+        FILE *fp;
+        fp = fopen("input.txt","r"); // read mode
 
-void push(char);
-void  pop(void);
-void display(void);
-char top();
-
-void main ()
-{
-    s.top = -1;
-    int e=0,f=0,v=0;
-    push('E');
-    int i;
-    char *string1 = "w*zy+w*y+xx";
-    char *string2 = "w*zy+yy*z+xx";
-    printf("Select the string\n");
-    printf("\n1) String 1: %s \n2) String 2: %s\n\n", string1, string2);
-    int n=0;
-    char *string;
-    scanf("%d",&n);
-    if(n==1)
-        string=string1;
-    else if(n==2)
-        string = string2;
-    else
-    {
-        printf("\nInvalid choice");
-        exit(0);
-    }
-
-
-    for(i=0;i<lengthOf(string);i++)
-    {
-        int temp=0;
-        printf("\n\nToken: %c", string[i]);
-        if(top()=='E')
-        {
-            temp++;
-            printf("\nTop of stack: E");
-            e++;
-            if(e<3)
+       char charactersRead[1000];
+       char *str, delimit[2];
+        delimit[0] = ' ';
+        delimit[1] = '\0';;
+       int i;
+       while( ( ch = fgetc(fp) ) != EOF )
+       {
+            if(!iscntrl(ch))
             {
-                pop();
-                push('x');
-                push('E');
-                push('+');
-                push('T');
+                charactersRead[i] = ch;
+				i++;
             }
-            else
+			else
             {
-                pop();
-            }
-        }
-        if(top()=='T')
-        {
-            temp++;
-            printf("\nTop of stack: T");
-            pop();
-            push('V');
-            push('w');
-        }
-        if(top()=='V')
-        {
-            temp++;
-            printf("\nTop of stack: V");
-            v++;
-            if(v%2!=0)
-            {
-                pop();
-                push('V');
-                push('y');
-                push('F');
-                push('*');
-            }
-            else
-            {
-                pop();
+                charactersRead[i] = ' ';
+                i++;
             }
 
         }
-        if(top()=='F')
+        charactersRead[i] = '\0';
+
+        str= stringDelimiter (charactersRead,delimit);
+        printf("Lexical Item\t\tLexical Value\n");
+
+
+        while (str != NULL)
         {
-            temp++;
-            printf("\nTop of stack: F");
-            f++;
-            if(f==1)
+            char *ch = str;
+            char *i;
+            if(stringCompare(str,"DEFINITIONS",11)==0 || stringCompare(str,"AUTOMATIC",9)==0 || stringCompare(str,"TAGS",4)==0 || stringCompare(str,"BEGIN",5)==0 || stringCompare(str,"SEQUENCE",8)==0 || stringCompare(str,"VisibleString",13)==0 || stringCompare(str,"SIZE",4)==0 || stringCompare(str,"NumericString",13)==0 || stringCompare(str,"OPTIONAL",8)==0 || stringCompare(str,"FROM",4)==0 || stringCompare(str,"INTEGER",7)==0 || stringCompare(str,"BOOLEAN",7)==0 || stringCompare(str,"END",3)==0)
             {
-                pop();
-                push('z');
+                   printf("\nReserved word\t\t%s",str);
+                   str = stringDelimiter (NULL, " ");
+                   continue;
             }
 
-            else
-                pop();
-        }
-        if(top()=='w' && string[i]=='w')
-        {
-            temp++;
-            printf("\nTop of stack: w");
-            pop();
-        }
-        if(top()=='+' && string[i]=='+')
-        {
-            temp++;
-            printf("\nTop of stack: +");
-            pop();
-        }
-        if(top()=='x'&& string[i]=='x')
-        {
-            temp++;
-            printf("\nTop of stack: x");
-            pop();
-        }
-        if(top()=='z' && string[i]=='z')
-        {
-            temp++;
-            printf("\nTop of stack: z");
-            pop();
+            int j;
+            for(j=0;j<lengthOf(str);j++)
+            {
+                    char *i;
+                    i=ch;
+                    //Type reference
+                     if(i[0]>=65 && i[0]<=90)
+                     {
+
+                        if((i[j]>=97 && i[j]<=122)||(i[j]>=48 && i[j]<=57)||(i[j]>=65 && i[j]<=90)||(i[j]==45))
+                        {
+                           if((i[j]==45 && i[j+1]==45)|| (i[lengthOf(str)-1]==45))
+                            {
+                                break;
+
+                            }
+                            else if(j==lengthOf(str)-1)
+                            {
+                                printf("\nType reference\t\t%s",str);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                     }
+                     //Identifier
+                     else if(i[0]>=97 && i[0]<=122)
+                     {
+                        if((i[j]>=97 && i[j]<=122)||(i[j]>=48 && i[j]<=57)||(i[j]>=65 && i[j]<=90)||(i[j]==45))
+                        {
+                           if((i[j]==45 && i[j+1]==45)|| (i[lengthOf(str)-1]==45))
+                            {
+                                break;
+
+                            }
+                            else if(j==lengthOf(str)-1)
+                            {
+                                printf("\nIdentifier\t\t%s",str);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                     }
+                      //Number
+                    else if(i[0]>=48 && i[0]<=57)
+                    {
+                         if(i[j]>=48 && i[j]<=57)
+                         {
+                             if(j==lengthOf(str)-1)
+                                printf("\nNumber\t\t\t%s",str);
+                         }
+
+                    }
+                     // Assignment lexical item
+
+                    else if(i[0]==58 && i[1]==58 && i[2]==61)
+                    {
+                        if(j==2 && (lengthOf(str))==3)
+                        {
+                            printf("\nAssignment operator",str);
+                            break;
+                        }
+
+                    }
+                    // Range separator
+                    else if(i[0]==46 && i[1]==46)
+                    {
+                            printf("\nRange separator");
+                            break;
+                    }
+                    else if(i[0]==123)
+                    {
+                            printf("\nLCURLY");
+                            break;
+                    }
+                    else if(i[0]==125)
+                    {
+                            printf("\nRCURLY");
+                            break;
+                    }
+                    else if(i[0]==44)
+                    {
+                            printf("\nComma");
+                            break;
+                    }
+                    else if(i[0]==40)
+                    {
+                            printf("\nLParen");
+                            break;
+                    }
+                    else if(i[0]==41)
+                    {
+                            printf("\nRParen");
+                            break;
+                    }
+                    else if(i[0]==124)
+                    {
+                            printf("\nBar");
+                            break;
+                    }
+                    else if(i[0]==34)
+                    {
+                            printf("\nQuote");
+                            break;
+                    }
+                    else
+                    {
+                        printf("\nUnrecognized input");
+                    }
+            }
+            str = stringDelimiter (NULL, delimit);
 
         }
-        if(top()=='*' && string[i]=='*')
-        {
-            temp++;
-            printf("\nTop of stack: *");
-            pop();
-        }
-        if(top()=='y' && string[i]=='y')
-        {
-            temp++;
-            printf("\nTop of stack: y");
-            pop();
-        }
-        if(temp==0)
-        {
-            printf("\n\nString Rejected (no such rule in PDA)\n\n");
-            exit(0);
-        }
+        fclose(fp);
 
+        getch();
 
     }
-    printf("\n\nString Accepted\n\n");
 
-}
-/*  Function to add an element to the stack */
-void push (char token)
-{
-        if (s.top == (MAXSIZE - 1))
-        {
-            printf ("Stack is Full\n");
-            return;
-        }
-        s.top = s.top + 1;
-        s.stk[s.top] = token;
-}
-/*  Function to delete an element from the stack */
-    void pop ()
-    {
-        s.top = s.top - 1;
-    }
-
-char top()
-{
-    return s.stk[s.top];
-}
-/*  Function to display the status of the stack */
-void display ()
-{
-    int i;
-    if (s.top == -1)
-    {
-        printf ("Stack is empty\n");
-        return;
-    }
-    else
-    {
-        printf ("\n The status of the stack is \n");
-        for (i = s.top; i >= 0; i--)
-        {
-            printf ("%c\n", s.stk[i]);
-        }
-    }
-    printf ("\n");
-}
 int lengthOf(char *t)
 {
     int count=0;
@@ -200,3 +178,61 @@ int lengthOf(char *t)
     return(count);
 
 }
+int stringCompare(const char *s1, const char *s2)
+{
+    while((*s1 && *s2) && (*s1 == *s2))
+        s1++,s2++;
+    return *s1 - *s2;
+}
+
+char *stringDelimiter(char *str, char *comp)
+{
+	static int pos;
+	static char *s;
+	int i =0, start = pos;
+
+	// Copying the string for further calls of stringDelimiter
+	if(str!=NULL)
+		s = str;
+
+	i = 0;
+	int j = 0;
+	//While not end of string
+	while(s[pos] != '\0')
+	{
+		j = 0;
+		//Comparing of one of the delimiter matches the character in the string
+		while(comp[j] != '\0')
+		{
+			//Pos point to the next location in the string that we have to read
+			if(s[pos] == comp[j])
+			{
+				//Replace the delimter by \0 to break the string
+				s[pos] = '\0';
+				pos = pos+1;
+				//Checking for the case where there is no relevant string before the delimeter.
+				//start specifies the location from where we have to start reading the next character
+				if(s[start] != '\0')
+					return (&s[start]);
+				else
+				{
+					// Move to the next string after the delimiter
+					start = pos;
+					// Decrementing as it will be incremented at the end of the while loop
+					pos--;
+					break;
+				}
+			}
+			j++;
+		}
+		pos++;
+	}//End of Outer while
+	s[pos] = '\0';
+	if(s[start] == '\0')
+		return NULL;
+	else
+		return &s[start];
+}
+
+          
+        
